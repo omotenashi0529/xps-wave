@@ -9,8 +9,10 @@ wheels/
 # Virtual environments
 .venv
 
-# Claude Code local session state (not part of the project)
-.claude/
+# Claude Code local session state (not part of the project) - but .claude/skills/
+# IS tracked, since it's the reusable xps-analysis skill for this repo
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
 docs/claude_make.md
 
 # Third-party reference data - fetched at runtime by scripts/fetch_reference_data.py,

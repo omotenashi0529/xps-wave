@@ -62,9 +62,11 @@ scripts/
   fetch_reference_data.py   実測 Ti 2p 参照スペクトルをインターネットから取得
   evaluate_accuracy.py      実測データに対する精度評価（本パイプライン vs 専門家フィット）
   analyze_wide_spectrum.py  ワイドスペクトル解析のデモ（合成スペクトル、下記参照）
+  run_analysis.py           汎用CLI: 任意のVAMAS/CSVファイルを --mode {ti2p,region,wide} で解析
 tests/           background/peakfit/identify のユニットテスト
 data/raw/        取得した実測データ
 results/         精度評価・デモの出力（CSV, PNG）
+.claude/skills/xps-analysis/SKILL.md   このワークフローをまとめたカスタム Skill
 ```
 
 ## 解析アルゴリズムの要点
@@ -108,14 +110,12 @@ results/         精度評価・デモの出力（CSV, PNG）
 - 帯電補正（charge referencing、例: C1s adventitious carbon = 284.8 eV への補正）は自動化していない。ユーザー側で校正済みのBEスケールにしてから読み込むか、`Spectrum.energy` を直接シフトする必要がある（VAMASファイルにCasaXPS校正情報が埋め込まれている場合は自動適用される）。
 - ワイドスペクトルの単一ピークフィットは、スピン軌道二重線などの重なりを積極的にはモデル化しない（Ti は専用の `analyze_ti_2p()` を推奨）。
 
-## 推奨する Skill / MCP
+## Skill / MCP
 
-このタスクに現時点でジャストフィットする既存の Skill/MCPは無かったため、以下を提案する。
-
-1. **カスタム Skill "xps-analysis" の作成（推奨）**: 本リポジトリの `scripts/evaluate_accuracy.py` 相当のワークフロー（データ読み込み→背景除去→フィット→同定→レポート）を `SKILL.md` として切り出せば、次回以降 "このXPSデータを解析して" と頼むだけで一連の処理を再現できる。`find-skills` Skillで類似の既存Skillが公開されていないか確認可能。
-2. **Jupyter/ノートブック実行系 MCP**: `mcp__ide__executeCode` は既に利用可能（このセッションでも使用したPython実行環境の元）。装置から出力されたVAMASファイルを対話的に読み込んで即座にプロットしながら調整したい場合に有用。
-3. **文献・データベース検索用 MCP（あれば）**: NIST XPS Database や CCDC/PubChem 等、材料科学系のデータベースに直接クエリできるMCPサーバーがあれば、`reference.py` の値をハードコードでなく動的に検証・拡充できる。現時点で汎用的にAPI化されたNIST XPS DatabaseのMCP実装は確認できなかった（Web検索インターフェースのみ）。
-4. 既存の汎用 Skill としては **dataviz**（グラフ・可視化のデザイン指針）が `plotting.py` の見た目を改善する際に役立つ。
+- **カスタム Skill "xps-analysis"（実装済み）**: `.claude/skills/xps-analysis/SKILL.md`。このリポジトリで作業する際に自動的に候補として認識され、"このXPSデータを解析して" のような依頼で `scripts/run_analysis.py`（任意のVAMAS/CSVファイルを渡せる汎用CLI）を使った一連のワークフロー（読み込み→背景除去→フィット→同定→レポート）を再現できる。新しい元素・化学状態への拡張方法や既知の限界もSKILL.md内に記載。
+- **Jupyter/ノートブック実行系 MCP**: `mcp__ide__executeCode` は既に利用可能（このセッションでも使用したPython実行環境の元）。装置から出力されたVAMASファイルを対話的に読み込んで即座にプロットしながら調整したい場合に有用。
+- **文献・データベース検索用 MCP（あれば）**: NIST XPS Database や CCDC/PubChem 等、材料科学系のデータベースに直接クエリできるMCPサーバーがあれば、`reference.py` の値をハードコードでなく動的に検証・拡充できる。現時点で汎用的にAPI化されたNIST XPS DatabaseのMCP実装は確認できなかった（Web検索インターフェースのみ）。
+- 既存の汎用 Skill としては **dataviz**（グラフ・可視化のデザイン指針）が `plotting.py` の見た目を改善する際に役立つ。
 
 ## テスト
 
