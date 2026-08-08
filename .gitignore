@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Claude Code local session state (not part of the project)
+.claude/
+docs/claude_make.md
+
+# Third-party reference data - fetched at runtime by scripts/fetch_reference_data.py,
+# not vendored (see README.md "Data provenance")
+data/raw/*.vms
+
